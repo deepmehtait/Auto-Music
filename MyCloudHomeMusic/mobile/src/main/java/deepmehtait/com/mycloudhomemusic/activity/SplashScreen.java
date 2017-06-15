@@ -1,13 +1,17 @@
 package deepmehtait.com.mycloudhomemusic.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import deepmehtait.com.mycloudhomemusic.MainActivity;
+import deepmehtait.com.mycloudhomemusic.modals.configUrl.CloudServiceUrls;
 import deepmehtait.com.mycloudhomemusic.modals.configUrl.ConfigUrl;
 import deepmehtait.com.mycloudhomemusic.retrofit.Interfaces.ConfigService;
 import deepmehtait.com.mycloudhomemusic.retrofit.Utils.ApiUtils;
@@ -32,6 +36,15 @@ public class SplashScreen extends AppCompatActivity {
             public void onResponse(Call<ConfigUrl> call, Response<ConfigUrl> response) {
                 if (response.isSuccessful()) {
                     Log.d("success","got response"+ response.body().getData().getComponentMap().getCloudServiceUrls().getServiceAuth0Url());
+                    CloudServiceUrls cloudServiceUrls = response.body().getData().getComponentMap().getCloudServiceUrls();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(cloudServiceUrls);
+                    Log.d("urls", json);
+                    SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("cloudServiceUrls", json);
+                    editor.commit();
+
                 } else {
                     Log.d("error","yyyy");
                 }
